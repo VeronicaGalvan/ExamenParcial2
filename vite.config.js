@@ -2,28 +2,25 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), VitePWA({
-    registerType: 'autoUpdate',
-    devOptions: {
-      enabled: true
-    },
-    workbox: {
-      globPatterns: ['**/*.{js,css,html,ico,png,svg}']
-    },
-    includeAssets: ['/android','/ios','/windows11'],
-    manifest: {
-      name: 'Congreso TICs',
-      short_name: 'CongresoTICs',
-      description: 'Aplicación del Congreso de Tecnologías de la Información',
-      theme_color: '#007bff',
-      background_color: '#ffffff',
-      display_override: ["fullscreen", "minimal-ui", "window-controls-overlay"],
-      display: "standalone",
-      orientation: 'portrait',
-      start_url: '/',
-      scope: '/',
-      
+  plugins: [react(), VitePWA(
+    { registerType: 'autoUpdate',
+      devOptions: {
+        enabled: true
+      },
+      injectRegister: 'auto',
+
+        includeAssets: ['/android', '/ios', '/windows11'],
+
+      manifest: {
+        name: 'Congreso TICs',
+        short_name: 'CongresoTICs',
+        theme_color: '#007bff',
+        background_color: '#ffffff',
+        display: "standalone",
+        display_override: ["fullscreen", "minimal-ui", "window-controls-overlay"],
+
       icons: [
       {
         "src": "windows11/SmallTile.scale-100.png",
