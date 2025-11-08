@@ -14,11 +14,16 @@ export default defineConfig({
         includeAssets: ['/android', '/ios', '/windows11'],
 
       manifest: {
-        name: 'Congreso TICs',
-        short_name: 'CongresoTICs',
-        theme_color: '#007bff',
-        background_color: '#ffffff',
+        name: "Congress TICs",
+        short_name: "CongressTICs", 
+        description: "Congreso de Tecnologías de la Información",
+        id: "/",
+        start_url: "/",
+        scope: "/",
         display: "standalone",
+        theme_color: "#1a2a6c",
+        background_color: "#1a2a6c",
+        orientation: "portrait-primary",
         display_override: ["fullscreen", "minimal-ui", "window-controls-overlay"],
 
       icons: [
