@@ -1,2 +1,2 @@
-const API_URL = "https://localhost:7094/api"; // 👈 cambia el puerto si tu backend usa otro
+const API_URL = "https://examenparcial2back-1.onrender.com/api"; // 
 export default API_URL;
