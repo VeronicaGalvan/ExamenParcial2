@@ -1,89 +1,47 @@
-/**
- * Copyright 2018 Google Inc. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *     http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+const CACHE_NAME = 'congreso-tics-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/manifest.json'
+];
 
-// If the loader is already loaded, just stop.
-if (!self.define) {
-  let registry = {};
+self.addEventListener('install', (event) => {
+  console.log('Service Worker instalándose');
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        console.log('Cache abierto');
+        return cache.addAll(urlsToCache);
+      })
+  );
+});
 
-  // Used for `eval` and `importScripts` where we can't get script URL by other means.
-  // In both cases, it's safe to use a global var because those functions are synchronous.
-  let nextDefineUri;
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
+      }
+    )
+  );
+});
 
-  const singleRequire = (uri, parentUri) => {
-    uri = new URL(uri + ".js", parentUri).href;
-    return registry[uri] || (
-      
-        new Promise(resolve => {
-          if ("document" in self) {
-            const script = document.createElement("script");
-            script.src = uri;
-            script.onload = resolve;
-            document.head.appendChild(script);
-          } else {
-            nextDefineUri = uri;
-            importScripts(uri);
-            resolve();
+self.addEventListener('activate', (event) => {
+  console.log('Service Worker activado');
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Eliminando cache antiguo:', cacheName);
+            return caches.delete(cacheName);
           }
         })
-      
-      .then(() => {
-        let promise = registry[uri];
-        if (!promise) {
-          throw new Error(`Module ${uri} didn’t register its module`);
-        }
-        return promise;
-      })
-    );
-  };
-
-  self.define = (depsNames, factory) => {
-    const uri = nextDefineUri || ("document" in self ? document.currentScript.src : "") || location.href;
-    if (registry[uri]) {
-      // Module is already loading or loaded.
-      return;
-    }
-    let exports = {};
-    const require = depUri => singleRequire(depUri, uri);
-    const specialDeps = {
-      module: { uri },
-      exports,
-      require
-    };
-    registry[uri] = Promise.all(depsNames.map(
-      depName => specialDeps[depName] || require(depName)
-    )).then(deps => {
-      factory(...deps);
-      return exports;
-    });
-  };
-}
-define(['./workbox-54d0af47'], (function (workbox) { 'use strict';
-
-  self.skipWaiting();
-  workbox.clientsClaim();
-
-  /**
-   * The precacheAndRoute() method efficiently caches and responds to
-   * requests for URLs in the manifest.
-   * See https://goo.gl/S9QRab
-   */
-  workbox.precacheAndRoute([{
-    "url": "index.html",
-    "revision": "0.mok2j8eojho"
-  }], {});
-  workbox.cleanupOutdatedCaches();
-  workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
-    allowlist: [/^\/$/]
-  }));
-
-}));
+      );
+    })
+  );
+});
