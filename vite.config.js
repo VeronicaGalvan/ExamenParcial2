@@ -2,18 +2,16 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-
 export default defineConfig({
   plugins: [react(), VitePWA({
-      registerType: 'autoUpdate',
-      devOptions: {
+    registerType: 'autoUpdate',
+    devOptions: {
       enabled: true
     },
-
-    injectRegister: 'auto',
-
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+    },
     includeAssets: ['/android','/ios','/windows11'],
-
     manifest: {
       name: 'Congreso TICs',
       short_name: 'CongresoTICs',
@@ -24,6 +22,7 @@ export default defineConfig({
       display: "standalone",
       orientation: 'portrait',
       start_url: '/',
+      scope: '/',
       
       icons: [
       {
